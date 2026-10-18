@@ -1,0 +1,14 @@
+.banner {
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid currentColor;
+}
+
+.error {
+  background: var(--color-danger-bg);
+  color: var(--color-danger-fg);
+}
+
+.info {
+  background: var(--color-bg);
+  color: var(--color-muted);
+}

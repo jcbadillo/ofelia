@@ -1,0 +1,17 @@
+.editor {
+  display: block;
+  inline-size: 100%;
+  min-block-size: 1.5em;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: none;
+  field-sizing: content;
+}
+
+.editor:hover {
+  border-color: var(--color-muted);
+}

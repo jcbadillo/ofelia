@@ -4,6 +4,8 @@
   --color-fg: #1f2328;
   --color-muted: #59636e;
   --color-accent: #0969da;
+  --color-danger-bg: #ffebe9;
+  --color-danger-fg: #82071e;
   --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
   --space-1: 0.25rem;
@@ -19,6 +21,8 @@
     --color-fg: #e6edf3;
     --color-muted: #9198a1;
     --color-accent: #4493f8;
+    --color-danger-bg: #3c1618;
+    --color-danger-fg: #ffa198;
   }
 }
 
