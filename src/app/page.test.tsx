@@ -17,7 +17,7 @@ function renderApp() {
 describe('HomePage autosave (US-01)', () => {
   beforeEach(async () => {
     await db.blocks.clear();
-    useUiStore.setState({ storageError: null });
+    useUiStore.setState({ storageError: null, storageErrorBlocking: false });
   });
 
   afterEach(() => vi.restoreAllMocks());

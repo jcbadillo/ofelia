@@ -29,3 +29,29 @@ test('shows a banner when browser storage is unavailable', async ({ page }) => {
 
   await expect(storageBanner(page)).toBeVisible();
 });
+
+// US-02: an older app never writes over data from a newer schema version.
+test('shows a banner when the stored data comes from a newer version', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('textbox', { name: 'Block content' })).toBeVisible();
+
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const request = indexedDB.open('ofelia');
+        request.onerror = () => reject(request.error);
+        request.onsuccess = () => {
+          const tx = request.result.transaction('meta', 'readwrite');
+          tx.objectStore('meta').put({ key: 'schemaVersion', value: 99 });
+          tx.oncomplete = () => {
+            request.result.close();
+            resolve();
+          };
+          tx.onerror = () => reject(tx.error);
+        };
+      }),
+  );
+  await page.reload();
+
+  await expect(page.getByRole('alert').filter({ hasText: 'saved by a newer version of Ofelia' })).toBeVisible();
+});

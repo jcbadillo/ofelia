@@ -1,4 +1,4 @@
-export type StorageErrorKind = 'quota-exceeded' | 'unavailable' | 'unknown';
+export type StorageErrorKind = 'quota-exceeded' | 'unavailable' | 'migration-failed' | 'newer-version' | 'unknown';
 
 /** Every failed persistence call rejects with this error (Tech Spec §4). */
 export class StorageError extends Error {
@@ -23,6 +23,9 @@ export function toStorageError(error: unknown): StorageError {
   const name = errorName(error);
   if (name === 'QuotaExceededError') {
     return new StorageError('quota-exceeded', 'Browser storage is full.', { cause: error });
+  }
+  if (name === 'VersionError') {
+    return new StorageError('newer-version', 'Stored data belongs to a newer app version.', { cause: error });
   }
   if (
     name === 'InvalidStateError' ||

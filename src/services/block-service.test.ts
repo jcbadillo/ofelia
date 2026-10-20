@@ -81,6 +81,79 @@ describe('BlockService', () => {
     expect((await db.blocks.toArray()).map((b) => b.id)).toEqual([other.id]);
   });
 
+  describe('parent/child relationships', () => {
+    const childrenOf = async (parentId: string) =>
+      (await db.blocks.where('parentId').equals(parentId).toArray()).sort((a, b) => (a.order < b.order ? -1 : 1));
+
+    it('creates children under a parent, in order', async () => {
+      const parent = await service.createBlock({ pageDate: DAY, content: 'parent' });
+      const first = await service.createBlock({ pageDate: DAY, parentId: parent.id, content: 'first' });
+      const third = await service.createBlock({ pageDate: DAY, parentId: parent.id, content: 'third' });
+      const second = await service.createBlock({ pageDate: DAY, parentId: parent.id, afterId: first.id, content: 'second' });
+
+      expect(first.parentId).toBe(parent.id);
+      expect((await childrenOf(parent.id)).map((b) => b.id)).toEqual([first.id, second.id, third.id]);
+    });
+
+    it('orders children independently from top-level siblings', async () => {
+      const parent = await service.createBlock({ pageDate: DAY });
+      const child = await service.createBlock({ pageDate: DAY, parentId: parent.id });
+      const sibling = await service.createBlock({ pageDate: DAY });
+
+      const topLevel = (await db.blocks.toArray()).filter((b) => b.parentId === null).sort((a, b) => (a.order < b.order ? -1 : 1));
+      expect(topLevel.map((b) => b.id)).toEqual([parent.id, sibling.id]);
+      expect(child.order).toBe(parent.order);
+    });
+
+    it('rejects a parent that does not exist', async () => {
+      await expect(service.createBlock({ pageDate: DAY, parentId: 'missing' })).rejects.toThrow(/does not exist/);
+      expect(await db.blocks.count()).toBe(0);
+    });
+
+    it('updates a child without touching its parent', async () => {
+      const parent = await service.createBlock({ pageDate: DAY, content: 'parent #a' });
+      const child = await service.createBlock({ pageDate: DAY, parentId: parent.id, content: 'child' });
+      clock = new Date('2026-09-27T10:05:00.000Z');
+
+      await service.updateContent(child.id, 'child #b');
+
+      expect(await db.blocks.get(parent.id)).toEqual(parent);
+      expect(await db.blocks.get(child.id)).toMatchObject({ parentId: parent.id, tags: ['b'], updatedAt: clock.toISOString() });
+    });
+
+    it('does not let children inherit tags', async () => {
+      const parent = await service.createBlock({ pageDate: DAY, content: '#work' });
+      const child = await service.createBlock({ pageDate: DAY, parentId: parent.id, content: 'detail' });
+
+      expect(child.tags).toEqual([]);
+    });
+
+    it('deletes a 10-level deep subtree', async () => {
+      let parentId: string | null = null;
+      const chain = [];
+      for (let level = 0; level < 10; level++) {
+        const block = await service.createBlock({ pageDate: DAY, parentId });
+        chain.push(block);
+        parentId = block.id;
+      }
+
+      await service.deleteBlock(chain[0]!.id);
+
+      expect(await db.blocks.count()).toBe(0);
+    });
+
+    it('deletes a child but keeps its parent and siblings', async () => {
+      const parent = await service.createBlock({ pageDate: DAY });
+      const keep = await service.createBlock({ pageDate: DAY, parentId: parent.id });
+      const remove = await service.createBlock({ pageDate: DAY, parentId: parent.id });
+      await service.createBlock({ pageDate: DAY, parentId: remove.id });
+
+      await service.deleteBlock(remove.id);
+
+      expect((await db.blocks.toArray()).map((b) => b.id).sort()).toEqual([parent.id, keep.id].sort());
+    });
+  });
+
   it('survives reopening the database', async () => {
     const block = await service.createBlock({ pageDate: DAY, content: 'persisted' });
     db.close();
