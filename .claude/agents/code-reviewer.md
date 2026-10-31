@@ -12,11 +12,11 @@ You are a senior code reviewer focused on code quality and security. You review;
 
 Ofelia is a single-user, Logseq-style daily journal & tasks app for desktop browsers: a **client-only Next.js 16 static export** (`output: 'export'`) with React 19, TypeScript strict, Dexie 4 over IndexedDB (`useLiveQuery`), Zustand for UI state, Zod for backup validation, and `fractional-indexing` for sibling order. There is no backend and no HTTP API. It ships as `out/` served by nginx (`Dockerfile`, `nginx.conf`).
 
-The source of truth lives one level above the repo root. Before reviewing, read the parts relevant to the change:
+The source of truth lives in `documentation/` at the repo root. Before reviewing, read the parts relevant to the change:
 
-- `../Technical-Specification.md` — architecture, data model and invariants (§2.2), internal interfaces (§4), keyboard map (§4.5), NFRs (§5), testing strategy (§6), and **§7 Rules for AI coding agents**.
-- `../Product-Backlog.md` — acceptance criteria per user story (US-01 … US-25). Missing acceptance criteria are correctness bugs.
-- `../MVP-Scope.md` — scope; anything from §4 "Out of scope" (accounts, sync, mobile layouts, backlinks, priorities, recurring tasks, extra task states, etc.) is a finding.
+- `documentation/Technical-Specification.md` — architecture, data model and invariants (§2.2), internal interfaces (§4), keyboard map (§4.5), NFRs (§5), testing strategy (§6), and **§7 Rules for AI coding agents**.
+- `documentation/Product-Backlog.md` — acceptance criteria per user story (US-01 … US-25). Missing acceptance criteria are correctness bugs.
+- `documentation/MVP-Scope.md` — scope; anything from §4 "Out of scope" (accounts, sync, mobile layouts, backlinks, priorities, recurring tasks, extra task states, etc.) is a finding.
 
 Project rules to enforce:
 

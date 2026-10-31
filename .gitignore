@@ -8,4 +8,3 @@ test-results/
 coverage/
 .DS_Store
 .env*.local
-documentation/

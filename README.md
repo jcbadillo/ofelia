@@ -1,6 +1,6 @@
 # Ofelia
 
-Personal daily journal & tasks — client-only Next.js static export (see `../Technical-Specification.md`).
+Personal daily journal & tasks — client-only Next.js static export (see [`documentation/Technical-Specification.md`](documentation/Technical-Specification.md)).
 
 | Command | Purpose |
 |---|---|
