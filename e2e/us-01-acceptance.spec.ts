@@ -88,12 +88,13 @@ test('Any change (create, edit, move, delete, state change) is saved to IndexedD
 });
 
 test('After a page reload or a browser restart, the journal shows exactly the content it had before', async ({
-  browserType,
+  playwright,
+  browserName,
   baseURL,
 }, testInfo) => {
   const profile = testInfo.outputPath('profile');
   const launch = async () => {
-    const context = await browserType.launchPersistentContext(profile, { baseURL });
+    const context = await playwright[browserName].launchPersistentContext(profile, { baseURL });
     const page = context.pages()[0] ?? (await context.newPage());
     await page.goto('/');
     return { context, page };
