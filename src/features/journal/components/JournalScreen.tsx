@@ -1,32 +1,47 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
-import { today } from '@/domain/dates';
-import type { LocalDate } from '@/domain/types';
+import { useEffect, useState, useSyncExternalStore } from 'react';
+import { formatPageTitle, today } from '@/domain/dates';
 import { PageOutline } from '@/features/outline';
 import styles from './JournalScreen.module.css';
 
 const noopSubscribe = () => () => {};
 
-/** Today's local date on the client; `null` during static prerender, where "today" is the build day. */
-function useClientToday(): LocalDate | null {
-  return useSyncExternalStore(noopSubscribe, today, () => null);
+/** `false` during static prerender, where "today" would be the build day. */
+function useIsClient(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 }
 
-/** Today's page. Readable title and day navigation arrive with US-03 / US-04. */
+/** Today's page with a readable title. Day navigation arrives with US-04. */
 export function JournalScreen() {
-  const pageDate = useClientToday();
+  const isClient = useIsClient();
+
+  return <main className={styles.main}>{isClient ? <JournalPage /> : <p aria-busy="true">Loading…</p>}</main>;
+}
+
+function JournalPage() {
+  // Captured once per mount: the page stays on the day it opened on, even past midnight (US-03).
+  const [pageDate] = useState(today);
+  const title = formatPageTitle(pageDate);
+
+  useEffect(() => {
+    const previous = document.title;
+    document.title = `${title} · Ofelia`;
+    return () => {
+      document.title = previous;
+    };
+  }, [title]);
 
   return (
-    <main className={styles.main}>
-      {pageDate === null ? (
-        <p aria-busy="true">Loading…</p>
-      ) : (
-        <>
-          <h1>{pageDate}</h1>
-          <PageOutline pageDate={pageDate} />
-        </>
-      )}
-    </main>
+    <>
+      <h1 className={styles.title}>
+        <time dateTime={pageDate}>{title}</time>
+      </h1>
+      <PageOutline pageDate={pageDate} />
+    </>
   );
 }
