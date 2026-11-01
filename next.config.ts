@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: { unoptimized: true },
   trailingSlash: true,
+  experimental: { agentUpgrade: 'security' },
 };
 
 export default nextConfig;
