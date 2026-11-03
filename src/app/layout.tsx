@@ -5,6 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Ofelia',
+  applicationName: 'Ofelia',
   description: 'Personal daily journal & tasks',
 };
 
